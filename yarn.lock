@@ -3,22 +3,18 @@
 
 
 "@babel/runtime@^7.4.3":
-  version "7.4.4"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.4.4.tgz#dc2e34982eb236803aa27a07fea6857af1b9171d"
-  integrity sha512-w0+uT71b6Yi7i5SE0co4NioIpSYS6lLiXvCzWzGSKvpK5vdQtCbICHMj+gbAKAOtxiV6HsVh/MBdaF9EQ6faSg==
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.4.5.tgz#582bb531f5f9dc67d2fcb682979894f75e253f12"
+  integrity sha512-TuI4qpWZP6lGOGIuGWtp9sPluqYICmbk8T/1vpSysqJxRPkudh/ofFWyqdcMsDf2s7KvDL4/YHgKyvcS3g9CJQ==
   dependencies:
     regenerator-runtime "^0.13.2"
 
-"@joystream/types@=0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@joystream/types/-/types-0.1.2.tgz#5982e6a0bdb5d70946c6925331b01cf40a1f402a"
-  integrity sha512-8E+aAw4ADPXhZJzzOVz3dqHMXySYeZkxBzSf5hKPvgf3aolz7bRZgE8KyZGwVn5BYMYeQDDRnIefler5RpqBJQ==
+"@joystream/types@=0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@joystream/types/-/types-0.1.8.tgz#82648c0a88382f3fcfebf13dc1f39c16acf1fc59"
+  integrity sha512-60JhBWRhfx5FSuLReFbF9NQKPP7ZbRRzYgNWC6WN/EwDL0kMBUaaHtCWrf80JZ57kRXzBBjKaTSqaAPxz7VTEQ==
   dependencies:
-    "@polkadot/keyring" "^0.76.1"
-    "@polkadot/types" "^0.77.0-beta.4"
-    "@polkadot/util" "^0.76.1"
-    "@polkadot/util-crypto" "^0.76.1"
-    typescript "^3.4.5"
+    "@polkadot/types" "=0.77.1"
 
 "@polkadot/api-derive@^0.77.1":
   version "0.77.1"
@@ -31,7 +27,7 @@
     "@types/memoizee" "^0.4.2"
     memoizee "^0.4.14"
 
-"@polkadot/api@^0.77.0-beta.4", "@polkadot/api@^0.77.1":
+"@polkadot/api@^0.77.1":
   version "0.77.1"
   resolved "https://registry.yarnpkg.com/@polkadot/api/-/api-0.77.1.tgz#a8590ea4d59167674de967bbb303d12434fa75fb"
   integrity sha512-aEGe6ThEgRx4S2eJlYogiCDFnoNkbj/hHrcGZV87fP1NTXeE530Gz/P0zccTdjj3Vd0dMMpwcckiYOyJgC3z8w==
@@ -127,7 +123,7 @@
   resolved "https://registry.yarnpkg.com/@polkadot/ts/-/ts-0.1.56.tgz#ffd6e9c95704a7fb90b918193b9dc5c440114b27"
   integrity sha512-wnt4zXxZXyz6WaubTO/I+nUElwV2DogFzdl6CrKfVn2PTWp8uHN06W9s40FH57ORtmQfDr9rLRP8Nq+oIyElbg==
 
-"@polkadot/types@^0.77.0-beta.4", "@polkadot/types@^0.77.1":
+"@polkadot/types@=0.77.1", "@polkadot/types@^0.77.1":
   version "0.77.1"
   resolved "https://registry.yarnpkg.com/@polkadot/types/-/types-0.77.1.tgz#4cae293c4034a967100b149e1714e19b591e812c"
   integrity sha512-kYIKuGovO5yTvNuu/D2Q1lazxbm+i3e1ANlbXQHbOdIKVY67JFHtOmvACzm2uz5SuALxlG/K2NzkRvkblindOg==

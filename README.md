@@ -6,7 +6,7 @@ Repo with examples on how to use the @joystream/types package along with @polkad
 ## Examples
 
 ```
-yarn
+yarn && yarn build
 yarn run status
 ```
 

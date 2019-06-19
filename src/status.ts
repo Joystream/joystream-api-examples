@@ -1,6 +1,6 @@
 // @ts-check
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise, WsProvider, /*RuntimeVersion*/ } from '@polkadot/api';
 import { registerJoystreamTypes, Seat } from '@joystream/types';
 // import { SubscriptionResult, QueryableStorageFunction } from '@polkadot/api/promise/types';
 import { AccountId } from '@polkadot/types';
@@ -30,6 +30,10 @@ async function main () {
     api.query.council.activeCouncil() as unknown as Seat[],
     api.query.session.validators() as unknown as AccountId[]
   ]);
+
+  let version  = await api.rpc.chain.getRuntimeVersion() as any;
+
+  console.log(`Runtime Version: ${version.authoringVersion}.${version.specVersion}.${version.implVersion}`);
 
   // let council: QueryableStorageFunction<Seat[], SubscriptionResult> = (await api.query.council.activeCouncil()) as unknown as Seat[]
   // let council = (await api.query.council.activeCouncil()) as unknown as Seat[];

@@ -9,10 +9,10 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
-"@joystream/types@=0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@joystream/types/-/types-0.1.8.tgz#82648c0a88382f3fcfebf13dc1f39c16acf1fc59"
-  integrity sha512-60JhBWRhfx5FSuLReFbF9NQKPP7ZbRRzYgNWC6WN/EwDL0kMBUaaHtCWrf80JZ57kRXzBBjKaTSqaAPxz7VTEQ==
+"@joystream/types@=0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@joystream/types/-/types-0.3.1.tgz#b28b74b60828e4e3a5eb62c92ebb1ace76b7cc0b"
+  integrity sha512-GABwLVfaonB8PxU7bKuNP8pRNH3Sdlw+NkuvK7at7jKGnyzcWyQN6RDrFHCel/pSGXwHFIeAnHIGHyrm11nz0w==
   dependencies:
     "@polkadot/types" "=0.77.1"
 
@@ -849,7 +849,7 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^3.4.5:
+typescript@=3.4.5:
   version "3.4.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.4.5.tgz#2d2618d10bb566572b8d7aad5180d84257d70a99"
   integrity sha512-YycBxUb49UUhdNMU5aJ7z5Ej2XGmaIBL0x34vZ82fn3hGvD+bgrMrVDpatgz2f7YxUMJxMkbWxJZeAvDxVe7Vw==

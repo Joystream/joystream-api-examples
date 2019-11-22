@@ -8,7 +8,7 @@ async function main () {
   registerJoystreamTypes();
 
   // Create the API and wait until ready
-  const api = await ApiPromise.create(provider);
+  const api = await ApiPromise.create({provider});
 
   let current_block_hash = await api.rpc.chain.getBlockHash();
 

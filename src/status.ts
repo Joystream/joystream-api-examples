@@ -3,8 +3,9 @@
 import { ApiPromise, WsProvider, /*RuntimeVersion*/ } from '@polkadot/api';
 import { registerJoystreamTypes, Seat } from '@joystream/types';
 // import { SubscriptionResult, QueryableStorageFunction } from '@polkadot/api/promise/types';
-import { AccountId } from '@polkadot/types';
+import { GenericAccountId } from '@polkadot/types';
 
+// import BN from 'bn.js';
 const BN = require('bn.js');
 
 async function main () {
@@ -15,7 +16,7 @@ async function main () {
   registerJoystreamTypes();
 
   // Create the API and wait until ready
-  const api = await ApiPromise.create(provider);
+  const api = await ApiPromise.create({provider});
 
   // Retrieve the chain & node information information via rpc calls
   const [chain, nodeName, nodeVersion] = await Promise.all([
@@ -26,12 +27,9 @@ async function main () {
 
   console.log(`Chain ${chain} using ${nodeName} v${nodeVersion}`);
 
-  let [council, validators] = await Promise.all([
-    api.query.council.activeCouncil() as unknown as Seat[],
-    api.query.session.validators() as unknown as AccountId[]
-  ]);
-
-  let version  = await api.rpc.chain.getRuntimeVersion() as any;
+  let council = await api.query.council.activeCouncil() as unknown as Seat[];
+  let validators = await api.query.session.validators() as unknown as GenericAccountId[];
+  let version  = await api.rpc.state.getRuntimeVersion() as any;
 
   console.log(`Runtime Version: ${version.authoringVersion}.${version.specVersion}.${version.implVersion}`);
 
@@ -46,9 +44,7 @@ async function main () {
   if (validators && validators.length > 0) {
     // Retrieve the balances for all validators
     const validatorBalances = await Promise.all(
-      validators.map(authorityId =>
-        api.query.balances.freeBalance(authorityId)
-      )
+      validators.map(authorityId => api.query.balances.freeBalance(authorityId))
     );
 
     let totalValidatorBalances =

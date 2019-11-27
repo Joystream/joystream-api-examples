@@ -1,21 +1,14 @@
 // @ts-check
 
-import { ApiPromise, WsProvider, /*RuntimeVersion*/ } from '@polkadot/api';
-import { registerJoystreamTypes, Seat } from '@joystream/types';
-// import { SubscriptionResult, QueryableStorageFunction } from '@polkadot/api/promise/types';
+import { Seat } from '@joystream/types';
 import { AccountId } from '@polkadot/types';
+
+import create_api from './api';
 
 const BN = require('bn.js');
 
 async function main () {
-  // Initialise the provider to connect to the local node
-  const provider = new WsProvider('ws://127.0.0.1:9944');
-
-  // register types before creating the api
-  registerJoystreamTypes();
-
-  // Create the API and wait until ready
-  const api = await ApiPromise.create(provider);
+  const api = await create_api();
 
   // Retrieve the chain & node information information via rpc calls
   const [chain, nodeName, nodeVersion] = await Promise.all([

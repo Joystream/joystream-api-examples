@@ -1,14 +1,7 @@
-import { ApiPromise, WsProvider } from '@polkadot/api';
-import {registerJoystreamTypes} from '@joystream/types'
+import create_api from './api';
 
 async function main () {
-  const provider = new WsProvider('ws://127.0.0.1:9944');
-
-  // Register types before creating the api
-  registerJoystreamTypes();
-
-  // Create the API and wait until ready
-  const api = await ApiPromise.create(provider);
+  const api = await create_api();
 
   let current_block_hash = await api.rpc.chain.getBlockHash();
 

@@ -3,6 +3,8 @@ import { ApiPromise } from '@polkadot/api';
 import { PostId, Post, CategoryId, Category, ThreadId, Thread } from '@joystream/types/lib/forum';
 // import { Codec } from '@polkadot/types/types';
 
+const serialzer = process.argv[2] == "--raw" ? "toHex" : "toJSON"
+
 main()
 
 async function main () {
@@ -33,7 +35,7 @@ async function get_all_posts(api: ApiPromise) {
         let post = await api.query.forum.postById(id) as Post;
         // Assuming isEmpty is true if value doesn't exist in map!
         if (!post.isEmpty) {
-            posts.push([id, post.toJSON()])
+            posts.push([id, post[serialzer]()])
         }
     }
 
@@ -50,7 +52,7 @@ async function get_all_categories(api: ApiPromise) {
         let category = await api.query.forum.categoryById(id) as Category;
         // Assuming isEmpty is true if value doesn't exist in map!
         if (!category.isEmpty) {
-            categories.push([id, category.toJSON()])
+            categories.push([id, category[serialzer]()])
         }
     }
 
@@ -67,7 +69,7 @@ async function get_all_threads(api: ApiPromise) {
         let thread = await api.query.forum.threadById(id) as Thread;
         // Assuming isEmpty is true if value doesn't exist in map!
         if (!thread.isEmpty) {
-            threads.push([id, thread.toJSON()])
+            threads.push([id, thread[serialzer]()])
         }
     }
 

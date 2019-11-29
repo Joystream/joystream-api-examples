@@ -10,6 +10,8 @@ const SERIALIZER = process.argv[2] == "--encoded" ? "toHex" : "toJSON"
 // Note: Codec.toHex() re-encodes the value, based on how the type
 // was registered. It does NOT produce the same value read from storage
 // unless it was correctly defined with exact match.
+// Also toJSON() behaves similarly., and special case for types that are registered Vec<u8> vs Text
+// `Vec<u8>` produces a json array of numbers (byte array), `Text` produces a json string
 
 // To produce hex string without 0x prefix:
 // Buffer.from(codec_value.toU8a()).toString('hex') // without 0x prefix

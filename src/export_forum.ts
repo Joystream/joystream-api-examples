@@ -1,8 +1,11 @@
 import create_api from './api';
 import { ApiPromise } from '@polkadot/api';
-import { PostId, Post, CategoryId, Category, ThreadId, Thread } from '@joystream/types/lib/forum';
-import { CodecArg } from '@polkadot/types/types';
-import { Codec } from '@polkadot/types/types';
+import { PostId, Post, CategoryId, Category, ThreadId,
+    Thread, BlockchainTimestamp, OptionModerationAction, VecPostTextChange,
+    OptionChildPositionInParentCategory, ModerationAction
+} from '@joystream/types/lib/forum';
+import { Codec, CodecArg } from '@polkadot/types/types';
+import { BlockNumber, Text, AccountId, Bool, u32 } from '@polkadot/types';
 import assert from 'assert';
 
 const SERIALIZER = process.argv[2] == "--encoded" ? "toHex" : "toJSON"
@@ -75,6 +78,24 @@ async function get_all_posts(api: ApiPromise) {
 
     for (let id = first; id < next; id++ ) {
         let post = await get_forum_checked_storage<Post>(api, 'postById', id) as Post;
+
+        // Transformation to a value that makes sense in a new chain.
+        post = new Post({
+            id: post.id,
+            thread_id: post.thread_id,
+            nr_in_thread: post.nr_in_thread,
+            current_text: new Text(post.current_text),
+            moderation: moderationActionAtBlockOne(post.moderation),
+            // No reason to preserve change history
+            text_change_history: new VecPostTextChange(),
+            author_id: new AccountId(post.author_id),
+            created_at: new BlockchainTimestamp({
+                // old block number on a new chain doesn't make any sense
+                block: new BlockNumber(1),
+                time: post.created_at.time
+            }),
+        });
+
         posts.push([id, serialize(post)])
     }
 
@@ -89,6 +110,25 @@ async function get_all_categories(api: ApiPromise) {
 
     for (let id = first; id < next; id++ ) {
         let category = await get_forum_checked_storage<Category>(api, 'categoryById', id) as Category;
+
+        category = new Category({
+            id: new CategoryId(category.id),
+            title: new Text(category.title),
+            description: new Text(category.description),
+            created_at: new BlockchainTimestamp({
+                // old block number on a new chain doesn't make any sense
+                block: new BlockNumber(1),
+                time: category.created_at.time
+            }),
+            deleted: new Bool(category.deleted),
+            archived: new Bool(category.archived),
+            num_direct_subcategories: new u32(category.num_direct_subcategories),
+            num_direct_unmoderated_threads: new u32(category.num_direct_unmoderated_threads),
+            num_direct_moderated_threads: new u32(category.num_direct_moderated_threads),
+            position_in_parent_category: new OptionChildPositionInParentCategory(category.position_in_parent_category),
+            moderator_id: new AccountId(category.moderator_id),
+        });
+
         categories.push([id, serialize(category)])
     }
 
@@ -103,8 +143,42 @@ async function get_all_threads(api: ApiPromise) {
 
     for (let id = first; id < next; id++ ) {
         let thread =  await get_forum_checked_storage<Thread>(api, 'threadById', id) as Thread;
+
+        thread = new Thread({
+            id: new ThreadId(thread.id),
+            title: new Text(thread.title),
+            category_id: new CategoryId(thread.category_id),
+            nr_in_category: new u32(thread.nr_in_category),
+            moderation: moderationActionAtBlockOne(thread.moderation),
+            num_unmoderated_posts: new u32(thread.num_unmoderated_posts),
+            num_moderated_posts: new u32(thread.num_moderated_posts),
+            created_at: new BlockchainTimestamp({
+                // old block number on a new chain doesn't make any sense
+                block: new BlockNumber(1),
+                time: thread.created_at.time
+            }),
+            author_id: new AccountId(thread.author_id),
+        });
+
         threads.push([id, serialize(thread)]);
     }
 
     return threads;
+}
+
+function moderationActionAtBlockOne(
+    action: ModerationAction | undefined) : OptionModerationAction {
+
+    if(!action) {
+        return new OptionModerationAction();
+    } else {
+        return new OptionModerationAction(new ModerationAction({
+            moderated_at: new BlockchainTimestamp({
+                block: new BlockNumber(1),
+                time: action.moderated_at.time,
+            }),
+            moderator_id: new AccountId(action.moderator_id),
+            rationale: new Text(action.rationale)
+        }));
+    }
 }

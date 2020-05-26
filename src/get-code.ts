@@ -1,5 +1,5 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import {registerJoystreamTypes} from '@joystream/types'
+import {registerJoystreamTypes} from '@joystream/types';
 
 async function main () {
   const provider = new WsProvider('ws://127.0.0.1:9944');

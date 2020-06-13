@@ -75,6 +75,7 @@ export interface Overview {
   startIssuance: number,
   endIssuance: number,
   totalExchangeBurn: number,
+  totalValueExchanged: number,
   councilMintSpent: number,
   curatorMintSpent: number,
   validatorRewardsPaid: number,
@@ -104,7 +105,7 @@ export interface PoolChange {
 
 export interface PoolChangeHistory {
   blockHeight: number,
-  poolChange?: number,
+  poolChange: number,
   oldPool: number,
   newPool: number,
   tokensBurned: number,

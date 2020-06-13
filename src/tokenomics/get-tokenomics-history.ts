@@ -9,14 +9,15 @@ import { EntityId } from '@joystream/types/lib/versioned-store';
 import { MemberId } from '@joystream/types/lib/members';
 import { ProposalId, ProposalDetails, ProposalStatus, Active, VotingResults } from '@joystream/types/lib/proposals';
 import { MintId } from '@joystream/types/lib/mint';
-import { ActiveProposal, Overview, Slashing } from './interfaces';
-import { getCashouts, getStakingRewards, getSlash, getVote, getProposalCreated, getProposalStatusUpdated } from './get-history-events';
+import { ActiveProposal, Overview, Slashing, PoolChange } from './interfaces';
+import { getStakingRewards, getSlash, getVote, getProposalCreated, getProposalStatusUpdated } from './get-history-events';
 import { RoleParameters } from '@joystream/types/lib/roles';
-import { getPreviousPoolChanges } from './functions';
-import { topUps, oldExchanges } from './pool-changes';
+import { getPoolChanges } from './functions';
+import { topUps, allExchanges } from './pool-changes';
 
-const firstblock:number = 1162360
-const lastblock:number = 1162362
+// will not work with firstblock<909252
+const firstblock:number = 1231349
+const lastblock = 1251349
 const address: string = "5D5PhZQNJzcJXVBxwJxZcsutjKPqUPydrvpu6HeiBfMaeKQu"
 
 //const objectEntity = new ClassId(1)
@@ -67,9 +68,6 @@ async function main () {
     }
   }
 
-  const oldPoolHistory = await getPreviousPoolChanges(api,firstblock, topUps, oldExchanges)
-  const poolStart = oldPoolHistory[oldPoolHistory.length-1]
-  const poolHistory = [poolStart]
 
   //Iterate through all blocks to get all events (some things are only available this way)
   for (let blockHeight=firstblock; blockHeight<lastblock; blockHeight++) {
@@ -85,9 +83,12 @@ async function main () {
       if (event.section === 'balances' && event.method === 'Transfer') {
         const recipient = event.data[1] as AccountId;
         if (recipient.toString() === address) {
-          const poolData = poolHistory[poolHistory.length-1]
-          const newExchange = await getCashouts(api, event.data, poolData, oldHash, blockHeight)
-          poolHistory.push(newExchange)
+          const amountJOY = event.data[2] as Balance;
+          const newExchange:PoolChange = {
+            blockHeight: blockHeight,
+            amount: amountJOY.toNumber()
+          }
+          allExchanges.push(newExchange)
         }
 
       //Get validator rewards 
@@ -161,12 +162,18 @@ async function main () {
   for (let i=0; i<slashings.length; i++) {
     validatorBurnedBySlash += slashings[i].slashedAmount
   }
-  poolHistory.shift()
-  const poolEnd = poolHistory[poolHistory.length-1]
-  let totalExchanged = 0
 
+  const poolHistory = await getPoolChanges(api,firstblock,lastblock, topUps, allExchanges)
+  const poolStart = poolHistory[0]
+  const poolEnd = poolHistory[poolHistory.length-1]
+
+  let totalExchanged = 0
+  let totalValueExchanged = 0
   for (let i=0; i<poolHistory.length; i++) {
     totalExchanged += poolHistory[i].tokensBurned
+    if (poolHistory[i].poolChange < 0) {
+      totalValueExchanged += poolHistory[i].poolChange
+    }
   }
 
   let estimateOfStorageSpend = 0
@@ -179,12 +186,15 @@ async function main () {
     estimateOfStorageSpend += storageProviders*reward*rewardPeriod/600
   }
 
+
+
   const overview: Overview = {
     startBlock: firstblock,
     endBlock: lastblock,
     startIssuance: startIssuance.toNumber(),
     endIssuance: endIssuance.toNumber(),
     totalExchangeBurn: totalExchanged,
+    totalValueExchanged: totalValueExchanged,
     councilMintSpent: councilMintInfoEnd[0].get("total_minted").toNumber() - councilMintInfoStart[0].get("total_minted").toNumber(),
     curatorMintSpent: curatorMintInfoEnd[0].get("total_minted").toNumber() - curatorMintInfoStart[0].get("total_minted").toNumber(),
     validatorRewardsPaid: validatorRewardsPaid,
@@ -200,6 +210,8 @@ async function main () {
     rateAtEnd: poolEnd.newPool/endIssuance.toNumber()
   }
   console.log("summary",overview)
+
+  
   api.disconnect();
 }
 main()

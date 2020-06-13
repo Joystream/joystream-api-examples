@@ -2,13 +2,15 @@ import { ApiPromise } from "@polkadot/api"
 import { PoolChangeHistory, PoolChange } from "./interfaces"
 import { Hash, Balance } from "@polkadot/types/interfaces"
 
-export async function getPreviousPoolChanges(api: ApiPromise, firstblock:number, topUps:PoolChange[], oldExchanges: PoolChange[]): Promise<PoolChangeHistory[]> {
+export async function getPoolChanges(api: ApiPromise, firstblock:number, lastBlock: number, topUps:PoolChange[], allExchanges: PoolChange[]): Promise<PoolChangeHistory[]> {
   const blocks:number[] = []
   const blocksSorted:number[] = []
   const history:PoolChange[] = []
-  const poolChangeHistory:PoolChangeHistory[] = []
+  const poolChangeAll:PoolChangeHistory[] = []
+  const poolChangeInRange:PoolChangeHistory[] = []
+  const poolChangeNotInRange:PoolChangeHistory[] = []
   for (let i=0; i<topUps.length;i++) {
-    if (topUps[i].blockHeight < firstblock) {
+    if (topUps[i].blockHeight < lastBlock) {
       blocks.push(topUps[i].blockHeight)
       blocksSorted.push(topUps[i].blockHeight)
       history.push({
@@ -18,13 +20,13 @@ export async function getPreviousPoolChanges(api: ApiPromise, firstblock:number,
       })
     }
   }
-  for (let i=0; i<oldExchanges.length;i++) {
-    if (oldExchanges[i].blockHeight < firstblock) {
-      blocks.push(oldExchanges[i].blockHeight)
-      blocksSorted.push(oldExchanges[i].blockHeight)
+  for (let i=0; i<allExchanges.length;i++) {
+    if (allExchanges[i].blockHeight < lastBlock) {
+      blocks.push(allExchanges[i].blockHeight)
+      blocksSorted.push(allExchanges[i].blockHeight)
       history.push({
-        blockHeight: oldExchanges[i].blockHeight,
-        amount: -oldExchanges[i].amount
+        blockHeight: allExchanges[i].blockHeight,
+        amount: -allExchanges[i].amount
       })
     }
   }
@@ -43,7 +45,7 @@ export async function getPreviousPoolChanges(api: ApiPromise, firstblock:number,
       const issuanceAtExchange = await api.query.balances.totalIssuance.at(hash) as Balance
       const oldIssuance = await api.query.balances.totalIssuance.at(oldHash) as Balance
       let oldPool = 0;
-      oldPool += poolChangeHistory[i-1]?.newPool ?? 0;
+      oldPool += poolChangeAll[i-1]?.newPool ?? 0;
       let tokensBurned = historySorted[i].amount
       let poolChange = 0
       poolChange += historySorted[i].change ?? 0
@@ -57,14 +59,24 @@ export async function getPreviousPoolChanges(api: ApiPromise, firstblock:number,
         issuanceBefore: oldIssuance.toNumber(),
         issuanceAfter: issuanceAtExchange.toNumber()
       }
-      poolChangeHistory.push(poolChanged)
+      poolChangeAll.push(poolChanged)
+      if (poolChanged.blockHeight > firstblock) {
+        poolChangeInRange.push(poolChanged)
+      } else {
+        poolChangeNotInRange.push(poolChanged)
+      }
     }
-    return poolChangeHistory
+    const fistBlockHash: Hash = await api.rpc.chain.getBlockHash(firstblock)
+    const startIssuance = await api.query.balances.totalIssuance.at(fistBlockHash) as Balance
+    const poolStart = {
+      blockHeight: firstblock,
+      poolChange: 0,
+      oldPool: poolChangeNotInRange[poolChangeNotInRange.length-1].newPool,
+      newPool: poolChangeNotInRange[poolChangeNotInRange.length-1].newPool,
+      tokensBurned: 0,
+      issuanceBefore: startIssuance.toNumber(),
+      issuanceAfter: startIssuance.toNumber()
+    }
+    poolChangeInRange.unshift(poolStart)
+    return poolChangeInRange
   }
-
-
-
-
-
-  
-  

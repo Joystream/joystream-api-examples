@@ -10,7 +10,7 @@ import { MemberId } from '@joystream/types/lib/members';
 import { ProposalId, ProposalDetails, ProposalStatus, Active, VotingResults } from '@joystream/types/lib/proposals';
 import { MintId } from '@joystream/types/lib/mint';
 import { ActiveProposal, Overview, Slashing, PoolChange } from './interfaces';
-import { getStakingRewards, getSlash, getVote, getProposalCreated, getProposalStatusUpdated } from './get-history-events';
+import { getStakingRewards, getSlash, getVote, getProposalCreated, getProposalStatusUpdated, getActorJoined } from './get-history-events';
 import { RoleParameters } from '@joystream/types/lib/roles';
 import { getPoolChanges } from './functions';
 import { topUps, allExchanges } from './pool-changes';
@@ -18,7 +18,7 @@ import { topUps, allExchanges } from './pool-changes';
 // will not work with firstblock<909252
 const firstblock:number = 1231349
 const lastblock = 1251349
-const address: string = "5D5PhZQNJzcJXVBxwJxZcsutjKPqUPydrvpu6HeiBfMaeKQu"
+const burnAddress: string = "5D5PhZQNJzcJXVBxwJxZcsutjKPqUPydrvpu6HeiBfMaeKQu"
 
 //const objectEntity = new ClassId(1)
 //const videoEntity = new ClassId(7)
@@ -47,6 +47,8 @@ async function main () {
   const slashings: Slashing[] = []
   //const storageProviders = []
   const proposalIds: number[] = []
+  let transactionFees = 0
+  let storageFees = 0
   const proposalsAtStart = await api.query.proposalsEngine.proposalCount.at(fistBlockHash) as u32
   const proposalsAtEnd = await api.query.proposalsEngine.proposalCount.at(lastBlockHash) as u32
   //Get active proposals at start
@@ -82,7 +84,7 @@ async function main () {
       //Get exchanges
       if (event.section === 'balances' && event.method === 'Transfer') {
         const recipient = event.data[1] as AccountId;
-        if (recipient.toString() === address) {
+        if (recipient.toString() === burnAddress) {
           const amountJOY = event.data[2] as Balance;
           const newExchange:PoolChange = {
             blockHeight: blockHeight,
@@ -116,6 +118,13 @@ async function main () {
         //Get changes in the status of a proposal
       } else if (event.section === 'proposalsEngine' && event.method === 'ProposalStatusUpdated') {
         await getProposalStatusUpdated(event.data, proposals, proposalIds, blockHeight)
+
+      } else if (event.section === 'system' && event.method === 'extrinsicSuccess') {
+        transactionFees += 1
+      
+      } else if (event.section === 'actors' && event.method === 'Staked') {
+        storageFees += await getActorJoined(api, event.data, blockHash);
+
       }
     }
     oldHash = blockHash
@@ -191,6 +200,7 @@ async function main () {
   const overview: Overview = {
     startBlock: firstblock,
     endBlock: lastblock,
+    blockRange: lastblock-firstblock,
     startIssuance: startIssuance.toNumber(),
     endIssuance: endIssuance.toNumber(),
     totalExchangeBurn: totalExchanged,
@@ -200,6 +210,8 @@ async function main () {
     validatorRewardsPaid: validatorRewardsPaid,
     validatorBurnedBySlash: validatorBurnedBySlash,
     estimateOfStorageSpend: estimateOfStorageSpend,
+    storageSignupFeesPaid: transactionFees,
+    tokensBurnedFromExtrinsics: storageFees,
     proposalsMade: proposalsAtEnd.toNumber()-proposalsAtStart.toNumber(),
     forumPostsMade: forumPostsAtEnd.toNumber()-forumPostsAtStart.toNumber(),
     contentFilesAdded: entitiesAtEnd.toNumber()-entitiesAtStart.toNumber(),

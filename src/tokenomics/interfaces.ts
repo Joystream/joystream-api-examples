@@ -72,6 +72,7 @@ export interface StorageProviders {
 export interface Overview {
   startBlock: number,
   endBlock: number,
+  blockRange: number
   startIssuance: number,
   endIssuance: number,
   totalExchangeBurn: number,
@@ -81,6 +82,8 @@ export interface Overview {
   validatorRewardsPaid: number,
   validatorBurnedBySlash: number,
   estimateOfStorageSpend: number,
+  storageSignupFeesPaid: number,
+  tokensBurnedFromExtrinsics: number,
   proposalsMade: number,
   forumPostsMade: number,
   contentFilesAdded: number,

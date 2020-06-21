@@ -10,14 +10,14 @@ import { MemberId } from '@joystream/types/lib/members';
 import { ProposalId, ProposalDetails, ProposalStatus, Active, VotingResults } from '@joystream/types/lib/proposals';
 import { MintId } from '@joystream/types/lib/mint';
 import { ActiveProposal, Overview, Slashing, PoolChange } from './interfaces';
-import { getStakingRewards, getSlash, getVote, getProposalCreated, getProposalStatusUpdated, getActorJoined } from './get-history-events';
+import { getStakingRewards, getSlash, getVote, getProposalCreated, getProposalStatusUpdated } from './get-history-events';
 import { RoleParameters } from '@joystream/types/lib/roles';
 import { getPoolChanges } from './functions';
 import { topUps, allExchanges } from './pool-changes';
 
 // will not work with firstblock<909252
-const firstblock:number = 1231349
-const lastblock = 1251349
+const firstblock:number = 1260411
+const lastblock = 1308706
 const burnAddress: string = "5D5PhZQNJzcJXVBxwJxZcsutjKPqUPydrvpu6HeiBfMaeKQu"
 
 //const objectEntity = new ClassId(1)
@@ -121,12 +121,8 @@ async function main () {
 
       } else if (event.section === 'system' && event.method === 'extrinsicSuccess') {
         transactionFees += 1
-      
-      } else if (event.section === 'actors' && event.method === 'Staked') {
-        storageFees += await getActorJoined(api, event.data, blockHash);
-
-      }
     }
+  }
     oldHash = blockHash
   }
 

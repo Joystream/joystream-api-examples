@@ -30,6 +30,11 @@ export const topUps:PoolChange[] = [
     "blockHeight": 1249547,
     "amount": 0,
     "change": 370
+  },
+  {
+    "blockHeight": 1365602,
+    "amount": 0,
+    "change": 510
   }
 ]
 export const allExchanges: PoolChange[] = [
@@ -72,5 +77,33 @@ export const allExchanges: PoolChange[] = [
   {
     "amount": 500000,
     "blockHeight": 1234566,
+  },
+  {
+    "amount": 500000,
+    "blockHeight": 1250836,
+  },
+  {
+    "amount": 1000000,
+    "blockHeight": 1255030,
+  },
+  {
+    "amount": 1000000,
+    "blockHeight": 1264724,
+  },
+  {
+    "amount": 500000,
+    "blockHeight": 1282244,
+  },
+  {
+    "amount": 327447,
+    "blockHeight": 1285159,
+  },
+  {
+    "amount": 500000,
+    "blockHeight": 1346839,
+  },
+  {
+    "amount": 1000000,
+    "blockHeight": 1356206,
   }
 ]

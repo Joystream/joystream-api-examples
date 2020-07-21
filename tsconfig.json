@@ -66,8 +66,7 @@
     },
     "typeRoots": [
       "./node_modules/@polkadot/ts",
-      "./node_modules/@types",
-      "./node_modules/@joystream/types/lib"
+      "./node_modules/@types"
     ]
   },
   "include": [

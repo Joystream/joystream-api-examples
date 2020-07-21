@@ -1,5 +1,5 @@
-import { CuratorApplicationId } from '@joystream/types/lib/content-working-group';
-import { BTreeSet } from '@joystream/types';
+import { CuratorApplicationId } from '@joystream/types/content-working-group';
+import { BTreeSet } from '@joystream/types/common';
 let wgId:number[] = [1, 2];
 let set = new BTreeSet<CuratorApplicationId>(CuratorApplicationId, wgId);
 /*
@@ -10,5 +10,5 @@ With the "WG ID"s of the curators you wish to hire, in ascending order.
 To hire "WG ID" 18 21 and 16:
 let wgId:number[] = [16, 18, 21];
 */
-console.log('copy/paste the output below to hire applicant(s) with WG IDs:', wgId )
+console.log('copy/paste the output below to hire curator applicant(s) with WG IDs:', wgId )
 console.log(set.toHex())

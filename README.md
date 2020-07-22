@@ -39,3 +39,10 @@ async function main () {
 main();
 ```
 
+### Scripts
+
+You can run scripts that are found in the [./scripts/](./scripts) folder:
+
+```sh
+yarn script example
+```

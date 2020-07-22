@@ -1,7 +1,8 @@
 // @ts-check
 
 import { ApiPromise, WsProvider, /*RuntimeVersion*/ } from '@polkadot/api';
-import { registerJoystreamTypes, Seat } from '@joystream/types';
+import { registerJoystreamTypes } from '@joystream/types';
+import { Seat } from '@joystream/types/council';
 // import { SubscriptionResult, QueryableStorageFunction } from '@polkadot/api/promise/types';
 import { GenericAccountId } from '@polkadot/types';
 

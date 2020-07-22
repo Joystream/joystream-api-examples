@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "status": "node lib/status"
+    "status": "node lib/status",
+    "script": "node lib/script"
   },
   "dependencies": {
     "@joystream/types": "^0.12.0",

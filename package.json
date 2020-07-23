@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc --build tsconfig.json",
     "status": "node lib/status",
-    "script": "node lib/script"
+    "script": "node lib/script",
+    "postinstall": "yarn build"
   },
   "dependencies": {
     "@joystream/types": "^0.12.0",

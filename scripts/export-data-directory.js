@@ -7,6 +7,8 @@
 // https://testnet.joystream.org/#/js
 
 const script = async ({ api, hashing, keyring, types, util }) => {
+  const runtimeSpecVersion = api.runtimeVersion.specVersion
+
   const ownerAccountToMemberId = async (accountId) => {
     const memberIds = await api.query.members.memberIdsByRootAccountId(accountId)
     return memberIds[0] || null
@@ -24,11 +26,11 @@ const script = async ({ api, hashing, keyring, types, util }) => {
     obj = obj.unwrap()
 
     return [id, {
-      owner: await ownerAccountToMemberId(obj.owner),
+      owner: runtimeSpecVersion <= 15 ? await ownerAccountToMemberId(obj.owner) : obj.owner,
       added_at: obj.added_at,
       type_id: obj.type_id,
       size: obj.size_in_bytes,
-      liaison: new types.u64(0),
+      liaison: runtimeSpecVersion <= 15 ? new types.u64(0) : obj.liaison,
       liaison_judgement: obj.liaison_judgement,
       ipfs_content_id: obj.ipfs_content_id }]
   }))

@@ -8,18 +8,6 @@
 //
 // requires nicaea release+
 
-const logTxCycle = ({ events = [], status }) => {
-  if (status.isFinalized) {
-    console.log('TX Finalized')
-  } else {
-    console.log('TX Status: ' + status.type)
-  }
-
-  events.forEach(({ phase, event: { data, method, section } }) => {
-    console.log(phase.toString() + ' : ' + section + '.' + method + ' ' + data.toString())
-  })
-}
-
 const script = async ({ api, keyring, types }) => {
   if (api.runtimeVersion.specVersion <= 15) {
     console.error('This script requires a newer runtime')
@@ -64,7 +52,9 @@ const script = async ({ api, keyring, types }) => {
     const injectTx = api.tx.dataDirectory.injectDataObjects(objectsMap)
     const sudoTx = api.tx.sudo.sudo(injectTx)
     console.log(`injecting ${batch.length} objects`)
-    await sudoTx.sign(sudo, {nonce}).send(logTxCycle)
+    const signed = sudoTx.sign(sudo, {nonce})
+    await signed.send()
+    console.log(`nonce: ${nonce.toNumber()}, tx hash: ${signed.hash}`)
     nonce = nonce.addn(1)
   }
 }

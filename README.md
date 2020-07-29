@@ -24,7 +24,7 @@ async function main () {
   registerJoystreamTypes();
 
   // Create the API and wait until ready
-  const api = await ApiPromise.create(provider);
+  const api = await ApiPromise.create({ provider });
 
   // Retrieve the chain & node information information via rpc calls
   const [chain, nodeName, nodeVersion] = await Promise.all([
@@ -39,3 +39,10 @@ async function main () {
 main();
 ```
 
+### Scripts
+
+You can run scripts that are found in the [./scripts/](./scripts) folder:
+
+```sh
+yarn script example
+```

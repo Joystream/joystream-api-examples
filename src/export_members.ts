@@ -32,7 +32,7 @@ async function get_all_members(api: ApiPromise) {
             members.push({
                 id: id,
                 root_account: p.root_account.toString(), // ss58 encoding
-                role_account: p.controller_account.toString(), // ss58 encoding
+                controller_account: p.controller_account.toString(), // ss58 encoding
                 handle: p.handle,
                 avatar_uri: p.avatar_uri,
                 about: p.about,

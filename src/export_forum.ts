@@ -20,8 +20,8 @@ import { Text, bool as Bool, u32, Option, u64 } from '@polkadot/types';
 
 function serialize<T extends Codec>(value: T, encoding: string = 'json') : string | AnyJson {
     if (encoding == 'hex') {
-        // convert to hex and strip 0x prefix
-        return value.toHex().substr(2)
+        // convert to hex 
+        return value.toHex() //.substr(2) //strips 0x prefix
     } else {
         return value.toJSON()
     }
@@ -39,9 +39,9 @@ async function main () {
     const threads = await get_all_threads(api);
 
     let forum_data = {
-        categories: categories.map(({id, category}) => [id, serialize(category, encoding)]),
-        posts: posts.map(({id, post}) => [id, serialize(post, encoding)]),
-        threads: threads.map(({id, thread}) => [id, serialize(thread, encoding)]),
+        categories: categories.map(category => serialize(category, encoding)),
+        posts: posts.map(post => serialize(post, encoding)),
+        threads: threads.map(thread => serialize(thread, encoding)),
     };
 
     console.log(JSON.stringify(forum_data));
@@ -89,7 +89,7 @@ async function get_all_posts(api: ApiPromise) {
             }),
         });
 
-        posts.push({ id, post })
+        posts.push(post)
     }
 
     return posts;
@@ -122,7 +122,7 @@ async function get_all_categories(api: ApiPromise) {
             moderator_id: category.moderator_id,
         });
 
-        categories.push({ id, category })
+        categories.push(category)
     }
 
     return categories;
@@ -153,7 +153,7 @@ async function get_all_threads(api: ApiPromise) {
             author_id: thread.author_id,
         });
 
-        threads.push({ id, thread });
+        threads.push(thread);
     }
 
     return threads;

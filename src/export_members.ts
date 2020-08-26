@@ -30,13 +30,13 @@ async function get_all_members(api: ApiPromise) {
             // Note: MemberId is not preserved (if on import the same first id is used and there are no gaps in the array
             // then the member will get the same member id assigned (assuming it is also numberic))
             members.push({
-                memberId: id,
-                rootAddress: p.root_account.toString(), // ss58 encoding
-                controllerAddress: p.controller_account.toString(), // ss58 encoding
+                member_id: id,
+                root_address: p.root_account.toString(), // ss58 encoding
+                controller_address: p.controller_account.toString(), // ss58 encoding
                 handle: p.handle,
-                avatarUri: p.avatar_uri,
+                avatar_uri: p.avatar_uri,
                 about: p.about,
-                registeredAtTime: fixedTimestamp(p.registered_at_time)
+                registered_at_time: fixedTimestamp(p.registered_at_time)
             });
         }
     }

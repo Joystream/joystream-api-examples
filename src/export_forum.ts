@@ -14,24 +14,9 @@ import { Text, bool as Bool, u32, Option, u64 } from '@polkadot/types';
 // Also toJSON() behaves similarly., and special case for types that are registered Vec<u8> vs Text
 // `Vec<u8>` produces a json array of numbers (byte array), `Text` produces a json string
 
-// To produce hex string without 0x prefix:
-// Buffer.from(codec_value.toU8a()).toString('hex') // without 0x prefix
-// alternatively we can just hex_string.substr(2)
-
-function serialize<T extends Codec>(value: T, encoding: string = 'json') : string | AnyJson {
-    if (encoding == 'hex') {
-        // convert to hex 
-        return value.toHex() //.substr(2) //strips 0x prefix
-    } else {
-        return value.toJSON()
-    }
-}
-
 main()
 
 async function main () {
-    const encoding = process.argv[2] == "--encoded" ? "hex" : "json"
-
     const api = await create_api();
 
     const categories = await get_all_categories(api);
@@ -39,9 +24,9 @@ async function main () {
     const threads = await get_all_threads(api);
 
     let forum_data = {
-        categories: categories.map(category => serialize(category, encoding)),
-        posts: posts.map(post => serialize(post, encoding)),
-        threads: threads.map(thread => serialize(thread, encoding)),
+        categories: categories.map(category => category.toHex()),
+        posts: posts.map(post => post.toHex()),
+        threads: threads.map(thread => thread.toHex()),
     };
 
     console.log(JSON.stringify(forum_data));

@@ -5,7 +5,7 @@ import { Post, CategoryId, Category,
     Thread, OptionModerationAction, VecPostTextChange,
     OptionChildPositionInParentCategory, ModerationAction
 } from '@joystream/types/forum';
-import { Codec, CodecArg, AnyJson } from '@polkadot/types/types';
+import { Codec, CodecArg } from '@polkadot/types/types';
 import { Text, bool as Bool, u32, Option, u64 } from '@polkadot/types';
 
 // Note: Codec.toHex() re-encodes the value, based on how the type

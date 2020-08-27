@@ -1,8 +1,10 @@
-import create_api from './api';
-import { ApiPromise } from '@polkadot/api';
-import { MemberId, Profile } from '@joystream/types/members';
-import { Option, u32, u64 } from '@polkadot/types/';
-import { BlockAndTime } from '@joystream/types/common';
+import create_api from './api'
+import { ApiPromise } from '@polkadot/api'
+import { MemberId, Profile } from '@joystream/types/members'
+import { Option, u32, u64 } from '@polkadot/types/'
+import { BlockAndTime } from '@joystream/types/common'
+
+import { GenesisMember } from './genesis_member'
 
 main()
 
@@ -16,7 +18,7 @@ async function main () {
     api.disconnect();
 }
 
-async function get_all_members(api: ApiPromise) {
+async function get_all_members(api: ApiPromise) : Promise<GenesisMember[]> {
     const first = 0
     const next = (await api.query.members.membersCreated() as MemberId).toNumber();
 
@@ -27,17 +29,15 @@ async function get_all_members(api: ApiPromise) {
 
         if (profile.isSome) {
             const p = profile.unwrap() as Profile;
-            // Note: MemberId is not preserved (if on import the same first id is used and there are no gaps in the array
-            // then the member will get the same member id assigned (assuming it is also numberic))
-            members.push({
-                member_id: id,
-                root_address: p.root_account.toString(), // ss58 encoding
-                controller_address: p.controller_account.toString(), // ss58 encoding
+            members.push(new GenesisMember({
+                member_id: new MemberId(id),
+                root_account: p.root_account,
+                controller_account: p.controller_account,
                 handle: p.handle,
                 avatar_uri: p.avatar_uri,
                 about: p.about,
                 registered_at_time: fixedTimestamp(p.registered_at_time)
-            });
+            }));
         }
     }
 

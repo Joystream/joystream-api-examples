@@ -45,9 +45,9 @@ async function main () {
                 maintainer: maintainer ? maintainer.toHex() : null
             })
         ),
-        dataObjects: dataDirectory.map(content => ({
-            contentId: content.contentId.toHex(),
-            dataObject: content.dataObject.toHex()
+        data_objects: dataDirectory.map(content => ({
+            content_id: content.content_id.toHex(),
+            data_object: content.data_object.toHex()
         }))
     }
 
@@ -167,19 +167,19 @@ async function get_data_directory_from_entities(api: ApiPromise, entities: Entit
     const dataDirectory = []
 
     for (let i = 0; i < contentIds.length; i++) {
-        const contentId = contentIds[i]
-        const dataObject = await api.query.dataDirectory.dataObjectByContentId(contentId) as Option<DataObject>
+        const content_id = contentIds[i]
+        const data_object = await api.query.dataDirectory.dataObjectByContentId(content_id) as Option<DataObject>
         
-        if (dataObject.isNone) {
+        if (data_object.isNone) {
             console.log('Warning: Entity references a non existent contentId')
             continue
         }
 
-        const obj = dataObject.unwrap()
+        const obj = data_object.unwrap()
 
         dataDirectory.push({
-            contentId,
-            dataObject: new DataObject({
+            content_id,
+            data_object: new DataObject({
                 owner: obj.owner,
                 added_at: new BlockAndTime({
                     block: new u32(1),

@@ -7,6 +7,7 @@ import { Credential, BlockAndTime } from '@joystream/types/common'
 import { ClassId, EntityId, Class, Entity, VecClassPropertyValue } from '@joystream/types/versioned-store'
 import { ClassPermissionsType } from '@joystream/types/versioned-store/permissions'
 import { DataObject, ContentId } from '@joystream/types/media'
+import { Channel, ChannelId } from '@joystream/types/content-working-group'
 import { assert } from '@polkadot/util'
 
 // Nicaea schemas
@@ -34,6 +35,8 @@ async function main () {
         exportedEntities.map(({ entity }) => entity)
     )
 
+    const channels = await get_channels(api)
+
     const versioned_store_data = {
         classes: classes.map(classAndPermissions => ({
             class: classAndPermissions.class.toHex(),
@@ -48,7 +51,8 @@ async function main () {
         data_objects: dataDirectory.map(content => ({
             content_id: content.content_id.toHex(),
             data_object: content.data_object.toHex()
-        }))
+        })),
+        channels: channels.map(channel => ({id: channel.id, channel: channel.channel.toHex()}))
     }
 
     api.disconnect()
@@ -195,4 +199,17 @@ async function get_data_directory_from_entities(api: ApiPromise, entities: Entit
     }
 
     return dataDirectory
+}
+
+async function get_channels(api: ApiPromise) {
+    const firstChannelId = 1
+    const nextChannelId = (await api.query.contentWorkingGroup.nextChannelId()) as ChannelId
+    const channels = []
+
+    for (let id = firstChannelId; nextChannelId.gtn(id); id++) {
+        const channel = (await api.query.contentWorkingGroup.channelById(id)) as Channel
+        channels.push({id, channel})
+    }
+
+    return channels
 }

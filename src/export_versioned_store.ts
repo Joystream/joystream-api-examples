@@ -4,7 +4,7 @@ import { Codec, CodecArg } from '@polkadot/types/types'
 import { Option, Tuple, u64, u32 } from '@polkadot/types'
 import { SingleLinkedMapEntry } from './linkedMap'
 import { Credential, BlockAndTime } from '@joystream/types/common'
-import { ClassId, EntityId, Class, Entity, VecClassPropertyValue } from '@joystream/types/versioned-store'
+import { ClassId, EntityId, Class, Entity } from '@joystream/types/versioned-store'
 import { ClassPermissionsType } from '@joystream/types/versioned-store/permissions'
 import { DataObject, ContentId } from '@joystream/types/media'
 import { Channel, ChannelId } from '@joystream/types/content-working-group'
@@ -115,17 +115,8 @@ async function get_all_entities(api: ApiPromise) : Promise<ExportedEntities> {
             maintainerEntry.unwrap()
         ).value : undefined
 
-        if (entity.class_id.eq(VIDEO_CLASS_ID)) {
-            if (EXCLUDED_VIDEOS.includes(id)) {
-                // clear the entity property values - but keep the entity
-                // so not to introduce gaps in they entity id keyspace
-                entity = new Entity({
-                    id: entity.id,
-                    class_id: entity.class_id,
-                    in_class_schema_indexes: entity.in_class_schema_indexes,
-                    values: new VecClassPropertyValue([])
-                })
-            }
+        if (entity.class_id.eq(VIDEO_CLASS_ID) && EXCLUDED_VIDEOS.includes(id)) {
+            continue
         }
 
         entities.push({

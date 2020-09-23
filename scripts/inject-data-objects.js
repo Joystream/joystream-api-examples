@@ -1,5 +1,7 @@
 /* global api, hashing, keyring, types, util, window */
 
+const { isJSDocTypeExpression } = require("typescript")
+
 // run this script with:
 // yarn script injectDataObjects
 //
@@ -8,12 +10,7 @@
 //
 // requires nicaea release+
 
-const script = async ({ api, keyring, types }) => {
-  if (api.runtimeVersion.specVersion <= 15) {
-    console.error('This script requires a newer runtime')
-    return
-  }
-
+const script = async ({ api, keyring, types, joy }) => {
   // map must be sorted or we get BadProof error when transaction is submitted and decoded by
   // the node. Make sure they are exported in sorted order
   // As of July-22-2020
@@ -32,7 +29,7 @@ const script = async ({ api, keyring, types }) => {
     sudo = sudoAddress
   }
 
-  let nonce = await api.query.system.accountNonce(sudoAddress)
+  let nonce = (await api.query.system.account(sudoAddress)).nonce
   const max = api.consts.dataDirectory.maxObjectsPerInjection.toNumber()
 
   const preInjectionIds = await api.query.dataDirectory.knownContentIds()
@@ -41,11 +38,11 @@ const script = async ({ api, keyring, types }) => {
   // split injection into batches of max objects
   while(parsed.length) {
     const batch = parsed.splice(0, max)
-    const objectsMap = types.createType('DataObjectsMap')
+    const objectsMap = api.createType('DataObjectsMap') // new joy.media.DataObjectsMap(api.registry)
     batch.forEach(([id, object]) => {
       objectsMap.set(
-        types.createType('ContentId', id),
-        types.createType('DataObject', object)
+        api.createType('ContentId', id),
+        api.createType('DataObject', object)
       )
     })
 

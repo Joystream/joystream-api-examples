@@ -1,10 +1,9 @@
 // @ts-check
 
-import { ApiPromise, WsProvider, /*RuntimeVersion*/ } from '@polkadot/api';
-import { registerJoystreamTypes } from '@joystream/types';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import { types } from '@joystream/types'
 import { Seat } from '@joystream/types/council';
-// import { SubscriptionResult, QueryableStorageFunction } from '@polkadot/api/promise/types';
-import { GenericAccountId } from '@polkadot/types';
+// import { ValidatorId } from '@polkadot/types/interfaces';
 
 // import BN from 'bn.js';
 const BN = require('bn.js');
@@ -13,11 +12,8 @@ async function main () {
   // Initialise the provider to connect to the local node
   const provider = new WsProvider('ws://127.0.0.1:9944');
 
-  // register types before creating the api
-  registerJoystreamTypes();
-
   // Create the API and wait until ready
-  const api = await ApiPromise.create({provider});
+  const api = await ApiPromise.create({ provider, types })
 
   // Retrieve the chain & node information information via rpc calls
   const [chain, nodeName, nodeVersion] = await Promise.all([
@@ -26,16 +22,13 @@ async function main () {
     api.rpc.system.version()
   ]);
 
-  console.log(`Chain ${chain} using ${nodeName} v${nodeVersion}`);
+  console.log(`Chain '${chain}' - node: ${nodeName} v${nodeVersion}`);
 
   let council = await api.query.council.activeCouncil() as unknown as Seat[];
-  let validators = await api.query.session.validators() as unknown as GenericAccountId[];
-  let version  = await api.rpc.state.getRuntimeVersion() as any;
+  let validators = await api.query.session.validators() //  as unknown as ValidatorId[];
+  let version  = await api.rpc.state.getRuntimeVersion() // as any;
 
   console.log(`Runtime Version: ${version.authoringVersion}.${version.specVersion}.${version.implVersion}`);
-
-  // let council: QueryableStorageFunction<Seat[], SubscriptionResult> = (await api.query.council.activeCouncil()) as unknown as Seat[]
-  // let council = (await api.query.council.activeCouncil()) as unknown as Seat[];
 
   // number of council members
   console.log('Council size:', council.length)
@@ -43,15 +36,15 @@ async function main () {
   console.log('Validator count:', validators.length);
 
   if (validators && validators.length > 0) {
-    // Retrieve the balances for all validators
+    // Retrieve the balances of validators' stash accounts
     const validatorBalances = await Promise.all(
-      validators.map(authorityId => api.query.balances.freeBalance(authorityId))
+      validators.map(authorityId => api.derive.balances.all(authorityId))
     );
 
-    let totalValidatorBalances =
-      validatorBalances.reduce((total, value) => total.add(value), new BN(0))
-
-    console.log('Total Validator Stake:', totalValidatorBalances.toString());
+    const totalValidatorBalances =
+      validatorBalances.reduce((total, value) => total.add(value.lockedBalance), new BN(0))
+    
+    console.log('Total Validator Locked Balances:', totalValidatorBalances.toString());
   }
 
   api.disconnect();

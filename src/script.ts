@@ -3,6 +3,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import * as types from '@polkadot/types'
 import * as util from '@polkadot/util'
+import { types as joyTypes } from '@joystream/types'
 import * as joy from '@joystream/types'
 import * as hashing from '@polkadot/util-crypto'
 import { Keyring } from '@polkadot/keyring'
@@ -10,7 +11,7 @@ import { Keyring } from '@polkadot/keyring'
 const scripts = require('../scripts')
 
 async function main () {
-  joy.registerJoystreamTypes()
+  
 
   const scriptArg = process.argv[2]
   const script = scripts[scriptArg]
@@ -23,7 +24,7 @@ async function main () {
 
   const provider = new WsProvider('ws://127.0.0.1:9944')
 
-  const api = await ApiPromise.create({ provider })
+  const api = await ApiPromise.create({ provider, types: joyTypes })
 
   // We don't pass a custom signer to the api so we must use a keyPair
   // when calling signAndSend on transactions

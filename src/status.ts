@@ -3,9 +3,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { types } from '@joystream/types'
 import { Seat } from '@joystream/types/council';
-// import { SubscriptionResult, QueryableStorageFunction } from '@polkadot/api/promise/types';
-// import { GenericAccountId } from '@polkadot/types';
-import { ValidatorId } from '@polkadot/types/interfaces';
+// import { ValidatorId } from '@polkadot/types/interfaces';
 
 // import BN from 'bn.js';
 const BN = require('bn.js');
@@ -24,16 +22,13 @@ async function main () {
     api.rpc.system.version()
   ]);
 
-  console.log(`Chain ${chain} using ${nodeName} v${nodeVersion}`);
+  console.log(`Chain '${chain}' - node: ${nodeName} v${nodeVersion}`);
 
-  let council = await api.query.council.activeCouncil() as unknown as Seat[];
-  let validators = await api.query.session.validators() as unknown as ValidatorId[];
-  let version  = await api.rpc.state.getRuntimeVersion() as any;
+  let council = await api.query.council.activeCouncil() // as unknown as Seat[];
+  let validators = await api.query.session.validators() //  as unknown as ValidatorId[];
+  let version  = await api.rpc.state.getRuntimeVersion() // as any;
 
   console.log(`Runtime Version: ${version.authoringVersion}.${version.specVersion}.${version.implVersion}`);
-
-  // let council: QueryableStorageFunction<Seat[], SubscriptionResult> = (await api.query.council.activeCouncil()) as unknown as Seat[]
-  // let council = (await api.query.council.activeCouncil()) as unknown as Seat[];
 
   // number of council members
   console.log('Council size:', council.length)
@@ -41,17 +36,15 @@ async function main () {
   console.log('Validator count:', validators.length);
 
   if (validators && validators.length > 0) {
-    // Retrieve the free balances for all validators
+    // Retrieve the balances of validators' stash accounts
     const validatorBalances = await Promise.all(
-      validators.map(authorityId => api.query.balances.account(authorityId))
+      validators.map(authorityId => api.derive.balances.all(authorityId))
     );
 
-    let totalValidatorBalances =
-      validatorBalances.reduce((total, value) => total.add(value.free), new BN(0))
-
-    // TODO: to get the staked amounts we need to read the account lock information.
+    const totalValidatorBalances =
+      validatorBalances.reduce((total, value) => total.add(value.lockedBalance), new BN(0))
     
-    console.log('Total Validator Free Balance:', totalValidatorBalances.toString());
+    console.log('Total Validator Locked Balances:', totalValidatorBalances.toString());
   }
 
   api.disconnect();

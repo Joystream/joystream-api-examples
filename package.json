@@ -10,7 +10,7 @@
     "postinstall": "yarn build"
   },
   "dependencies": {
-    "@joystream/types": "../joystream/types/",
+    "@joystream/types": "^0.13.1",
     "@polkadot/api": "1.26.1",
     "@polkadot/keyring": "^3.0.1",
     "@polkadot/types": "1.26.1",
